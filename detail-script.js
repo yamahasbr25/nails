@@ -3,8 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const keywordFromQuery = params.get('q') || '';
     const cleanQuery = keywordFromQuery.replace(/-\d+$/, '');
     
-    // --- KONFIGURASI GAMBAR LOKAL (UNTUK GRID) ---
-    const MAX_LOCAL_IMAGES = 100; // GANTI ANGKA INI sesuai jumlah gambar di folder
+    // --- KONFIGURASI GAMBAR LOKAL (UNTUK GAMBAR BERJAJAR DI BAWAH) ---
+    const MAX_LOCAL_IMAGES = 100; // SESUAIKAN DENGAN TOTAL GAMBAR DI FOLDER LOKAL
     let imagePool = Array.from({length: MAX_LOCAL_IMAGES}, (_, i) => i + 1);
     imagePool.sort(() => Math.random() - 0.5);
 
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         return `image/${imagePool.pop()}.jpg`;
     }
-    // ---------------------------------------------
+    // -----------------------------------------------------------------
     
     if (!cleanQuery) {
         runAGC('');
@@ -60,7 +60,9 @@ document.addEventListener('DOMContentLoaded', function() {
         document.title = seoTitle + ' | Nails Inspo';
         if(detailTitle) detailTitle.textContent = seoTitle;
         
-        // --- GAMBAR UTAMA (TETAP MENGGUNAKAN BING API) ---
+        // =========================================================
+        // 1. RENDER GAMBAR UTAMA BESAR & PINTEREST (API BING)
+        // =========================================================
         if(mainImageWrapper) {
             const mainQueryImg = keyword + " aesthetic nails pinterest";
             const mainImageUrl = `https://tse1.mm.bing.net/th?q=${encodeURIComponent(mainQueryImg)}&w=1080&h=1620&c=7&rs=1&p=0&dpr=2`;
@@ -78,6 +80,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if(detailBody) detailBody.innerHTML = `<p>Save your favorite <strong>${capitalize(keyword)}</strong> nail art ideas for your next appointment. Browse the gorgeous gallery below.</p>`;
 
+        // =========================================================
+        // 2. RENDER GAMBAR BERJAJAR GRID (FOLDER IMAGE/)
+        // =========================================================
         function renderGrid(dataArray, containerId) {
             const container = document.getElementById(containerId);
             if (!container) return;
@@ -140,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 let cleanKw = kwString.replace(/wallpaper|nails/gi, '').trim();
                 if(!cleanKw) cleanKw = kwString;
                 
-                // GAMBAR GRID: Menggunakan gambar lokal
+                // Ambil gambar secara acak dari folder lokal untuk grid
                 let imageUrl = getNextLocalImage();
                 return { kw: cleanKw, img: imageUrl };
             }
@@ -173,6 +178,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const top10 = finalList.slice(0, 10);
             const bottom10 = finalList.slice(10, 20);
+            
+            // Render ke grid di bawah gambar utama
             renderGrid(top10, 'related-wallpapers-container');
             renderGrid(bottom10, 'random-wallpapers-container');
         }
