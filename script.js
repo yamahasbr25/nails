@@ -6,6 +6,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const contentContainer = document.getElementById('auto-content-container');
     const loader = document.getElementById('loader');
     
+    // --- KONFIGURASI GAMBAR LOKAL ---
+    const MAX_LOCAL_IMAGES = 100; // GANTI ANGKA INI sesuai total gambar di folder image/
+    let imagePool = Array.from({length: MAX_LOCAL_IMAGES}, (_, i) => i + 1);
+    imagePool.sort(() => Math.random() - 0.5); // Acak urutan nomor gambar
+
+    function getNextLocalImage() {
+        if (imagePool.length === 0) {
+            imagePool = Array.from({length: MAX_LOCAL_IMAGES}, (_, i) => i + 1);
+            imagePool.sort(() => Math.random() - 0.5);
+        }
+        return `image/${imagePool.pop()}.jpg`;
+    }
+    // ---------------------------------
+    
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -54,17 +68,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const keywordForUrl = keyword.replace(/\s/g, '-').toLowerCase();
             const linkUrl = `detail.html?q=${encodeURIComponent(keywordForUrl)}`;
             
-            // Kueri dengan keyword nails & rasio 2:3 (1080x1620)
-            const queryImage = keyword + " nails pinterest";
-            const imageUrl = `https://tse1.mm.bing.net/th?q=${encodeURIComponent(queryImage)}&w=1080&h=1620&c=7&rs=1&p=0&dpr=2&pid=1.7`;
+            // Panggil fungsi gambar acak dari folder lokal
+            const imageUrl = getNextLocalImage();
             
             const article = document.createElement('div');
             article.className = 'wallpaper-card';
             
-            // Hapus tombol download, full gambar click-able ke detail page
             article.innerHTML = `
                 <a href="${linkUrl}" class="img-link" title="${title}">
-                    <img src="${imageUrl}" alt="${title}" loading="lazy">
+                    <img src="${imageUrl}" alt="${title}" loading="lazy" onerror="this.src='https://via.placeholder.com/1080x1620.png?text=Image+Not+Found'">
                 </a>
             `;
             fragment.appendChild(article);
